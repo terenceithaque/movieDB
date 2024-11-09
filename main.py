@@ -9,6 +9,11 @@ class Application(Tk):
         super().__init__() # Hériter des attributs de la classe Tk de tkinter
         self.title("movieDB - Votre base de données cinéphile") # Titre de la fenêtre principale de l'application
 
+        self.label_recherche = Label(self, text="Rechercher un film, un acteur, etc... :") # Libellé pour indiquer à l'utilisateur quels genres de choses il peut rechercher
+        self.label_recherche.pack()
+        self.barre_recherche = Entry(self) # Barre de recherche
+        self.barre_recherche.pack(fill="x")
+
 
 
 app = Application() # Créer une instance de l'application
