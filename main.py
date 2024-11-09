@@ -1,7 +1,7 @@
 "Script principal de l'application"
 from tkinter import * # Importer le module tkinter pour l'interface graphique
 from imdb import Cinemagoer # Importer Cinemagoer depuis l'API imdb
-
+from recherche import * # Importer le module recherche qui contient les fonctions de recherche sur IMDB
 
 class Application(Tk):
     def __init__(self):
