@@ -19,12 +19,14 @@ class Application(Tk):
         self.bouton_rechercher.pack()
 
         # Définir les colonnes pour l'arbre visuel des résultats de recherche
-        self.colonnes = ("titres_noms")
+        self.colonnes = ("titre", "réalisateur", "année")
         
         # Créer un abre visuel de résultats de recherche
         self.arbre_resultats = ttk.Treeview(self, columns=self.colonnes, show="headings")
         # Définition des en-têtes de l'abre visuel
-        self.arbre_resultats.heading("titres_noms", text="Titres / noms")
+        self.arbre_resultats.heading("titre", text="Titre")
+        self.arbre_resultats.heading("réalisateur", text="Réalisateur(s)")
+        self.arbre_resultats.heading("année", text="Année de sortie")
 
         self.arbre_resultats.pack(fill="both")
 
