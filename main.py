@@ -21,7 +21,13 @@ class Application(Tk):
         self.sous_menu_tri = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de tri
         self.menu_tri_filtres.add_cascade(label="Tri...", menu=self.sous_menu_tri)
         self.sous_menu_filtres = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de filtre
+
+        self.sous_menu_filtres.add_command(label="Titre...", command=None) # Commande de filtrage par titre
+        self.sous_menu_filtres.add_command(label="Réalisateur(s)...", command=None) # Commande de filtrage par réalisateur(s)
+        self.sous_menu_filtres.add_command(label="Année...", command=None) # Commande de filtrage par année de sortie
+
         self.menu_tri_filtres.add_cascade(label="Filtres...", menu=self.sous_menu_filtres)
+
         
         self.barre_menus.add_cascade(label="Tri & filtres", menu=self.menu_tri_filtres) # Ajouter le menu Tri & filtres à la barre de menus
         self.config(menu=self.barre_menus)
