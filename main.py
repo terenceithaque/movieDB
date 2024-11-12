@@ -39,6 +39,10 @@ class Application(Tk):
         self.bouton_rechercher.pack()                                                                                                                  
 
 
+        self.label_resultats_affiches = Label(self, text="Aucune recherche") # Libellé indiquant le nombre de résultats affichés et le nombre de résultats trouvés
+        self.label_resultats_affiches.pack()
+        self.resultats_affiches = 0 # Nombre de résultats affichés dans l'arbre visuel
+
         # Définir les colonnes pour l'arbre visuel des résultats de recherche
         self.colonnes = ("titre", "réalisateur", "année")
         
@@ -56,8 +60,12 @@ class Application(Tk):
         "Afficher les résultats de recherche"
         #self.arbre_resultats.delete("1.0", END)
         # Effacer les résultats de recherche précédents
+
+        
+
         for resultat in self.arbre_resultats.get_children():
             self.arbre_resultats.delete(resultat)
+            self.resultats_affiches -= 1 # Réduire le nombre résultats affichés
 
         self.arbre_resultats.insert("", END, values="".join("Recherhe en cours..."))
         self.arbre_resultats.update() # Mettre à jour l'arbre pour afficher le texte
@@ -69,9 +77,13 @@ class Application(Tk):
         if len(resultats_recheche) > 0: # Si des résultats de recherche ont été trouvés 
             for resultat in resultats_recheche: # Pour chaque résultat de recherche
                 self.arbre_resultats.insert("", END, values=resultat) # Ajouter le résultat à l'arbre de résultats
+                self.resultats_affiches += 1 # Augmenter le nombre de résultats affichés
 
         else: # Sinon
             self.arbre_resultats.insert(parent="", index="end", text="Oups ! Pas de résultats de recherche.")
+
+
+        self.label_resultats_affiches.config(text=f"{self.resultats_affiches} résultats affichés sur {len(resultats_recheche)}")    
             
 
 

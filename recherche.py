@@ -17,11 +17,9 @@ def rechercher(requete:str) -> list:
 
     # Algorithme de recherhe ci-dessous
 
-    resultats_max = 10 # Nombre maximum de résultats qu'on affichera
 
     films = explorateur.search_movie(requete) # Films contenant la requête dans leur titre
-    while len(films) > resultats_max: # Tant qu'on a plus de 10 résultats trouvés
-        films.remove(films[len(films) -1]) # Supprimer le derniner élément
+   
 
     #personnages = explorateur.search_character(requete) # Personnages de films contenant la requête dans leur nom
 
