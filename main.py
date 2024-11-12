@@ -16,6 +16,14 @@ class Application(Tk):
         self.menu_fichier.add_command(label="Quitter...", command=self.destroy) # Bouton pour quitter l'application
 
         self.barre_menus.add_cascade(label="Fichier", menu=self.menu_fichier)
+
+        self.menu_tri_filtres = Menu(self.barre_menus, tearoff=0) # Menu pour les options de tri et de filtre
+        self.sous_menu_tri = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de tri
+        self.menu_tri_filtres.add_cascade(label="Tri...", menu=self.sous_menu_tri)
+        self.sous_menu_filtres = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de filtre
+        self.menu_tri_filtres.add_cascade(label="Filtres...", menu=self.sous_menu_filtres)
+        
+        self.barre_menus.add_cascade(label="Tri & filtres", menu=self.menu_tri_filtres) # Ajouter le menu Tri & filtres à la barre de menus
         self.config(menu=self.barre_menus)
 
 
