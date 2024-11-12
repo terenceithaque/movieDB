@@ -3,6 +3,7 @@ from tkinter import * # Importer le module tkinter pour l'interface graphique
 from tkinter import ttk
 from imdb import Cinemagoer # Importer Cinemagoer depuis l'API imdb
 from recherche import * # Importer le module recherche qui contient les fonctions de recherche sur IMDB
+from filtrage import * # Importer le module filtrage qui contient des fonctions pour appliquer des filtres de recherche
 import threading
 
 class Application(Tk):
