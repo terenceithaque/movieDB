@@ -38,6 +38,7 @@ def rechercher(requete:str) -> list:
 
             titre = infos_film["title"] # Récupérer le titre du film
             realisateurs = [dir["name"] for dir in infos_film["directors"]] # Récupérer le(s) réalisateur(s) du film
+            print(f"Réalisateur(s) : {"".join(realisateurs)}")
             annee = infos_film["year"] # Récupérer l'année de sortie du film
 
             #print(f"Titre : {titre}, Réalisateur(s) : {"".join(realisateurs)}, Année : {annee} ")   

@@ -42,9 +42,12 @@ class Application(Tk):
         self.barre_recherche = Entry(self) # Barre de recherche
         self.barre_recherche.pack(fill="x")
 
+
         self.bouton_rechercher = Button(self, text="Rechercher !", command=lambda:threading.Thread(target=self.afficher_resultats_recherche).start()) # Bouton pour recherher le(s) terme(s) entrés dans la barre de recherche et afficher les résultats
                                                                                                                                                       # La méthode est appelée dans un nouveau thread pour éviter le blocage de la fenêtre 
-        self.bouton_rechercher.pack()                                                                                                                  
+        self.bouton_rechercher.pack()         
+
+        #self.barre_recherche.bind("<Return>", self.afficher_resultats_recherche)                                                                                                         
 
 
         self.label_statut_recherche = Label(self, text="Aucune recherche") # Libellé indiquant le statut de la recherche
@@ -66,7 +69,7 @@ class Application(Tk):
         self.arbre_resultats.pack(fill="both")
 
 
-    def afficher_resultats_recherche(self):
+    def afficher_resultats_recherche(self, event=None):
         "Afficher les résultats de recherche"
         #self.arbre_resultats.delete("1.0", END)
         # Effacer les résultats de recherche précédents
@@ -110,6 +113,7 @@ class Application(Tk):
 
 
             resultats_filtres = filtrer(self.resultats_recheche, filtre) # Filtrer les résultats de recherche avec le filtre saisi
+            print(f"Résultats correspondants au filtre '{filtre}' : {resultats_filtres}")
             for resultat in self.arbre_resultats.get_children(): # Pour chaque résultat présent dans l'arbre visuel
                 if not resultat in resultats_filtres: # Si le résultat ne fait pas partie des résultats filtrés
                     self.arbre_resultats.delete(resultat)   
