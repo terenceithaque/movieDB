@@ -1,5 +1,6 @@
 "recherche.py contient des fonctions permettant de rechercher des éléments sur IMDB via l'API imdb"
 from imdb import * # Importer l'API imdb
+from tkinter import messagebox
 from cache import * # Importer cache.py pour gérer les caches
 
 
@@ -48,7 +49,12 @@ def rechercher(requete:str) -> list:
 
         except Exception as e: # En cas d'erreur
             print(f"Erreur durant le traitement des résultats de recherche : {str(e)}") 
-            continue   
+            continue
+
+        except ConnectionError: # En cas d'erreur de connection
+            messagebox.showerror("Erreur de connexion", "Impossible de se connecter à IMDB. Vérifiez votre connexion Internet, puis réessayez.")
+            return liste_resultats # Si des résultats on quand même été trouvés, les renvoyer
+
 
         """id_film = film.movieID # ID IMDB du film
         infos_film = explorateur.get_movie(id_film) # Récupérer les infos sur le film (réalisateur(s), date,...)
@@ -70,6 +76,7 @@ def rechercher(requete:str) -> list:
     #    liste_resultats.append(personne) # Ajouter la personne à la liste des résultats    
 
     
-    print(f"Résultats trouvés : {liste_resultats}")
+    #print(f"Résultats trouvés : {liste_resultats}")
+    print("Recherche terminée !")
     return liste_resultats # Renvoyer la liste des résultats trouvés
     
