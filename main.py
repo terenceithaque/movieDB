@@ -1,6 +1,7 @@
 "Script principal de l'application"
 from tkinter import * # Importer le module tkinter pour l'interface graphique
 from tkinter import ttk
+from tkinter import messagebox
 from imdb import Cinemagoer # Importer Cinemagoer depuis l'API imdb
 from recherche import * # Importer le module recherche qui contient les fonctions de recherche sur IMDB
 from scripts_filtres.filtrage import * # Importer le module filtrage, qui contient des fonctions pour appliquer des filtres de recherche, depuis le dossier scripts_filtres
@@ -10,8 +11,6 @@ import threading
 
 
 
-def col_en_dict(col) -> dict:
-    "Renvoie le contenu d'une colonne sous forme de dictionnaire"
     
 class Application(Tk):
     def __init__(self):
@@ -21,7 +20,7 @@ class Application(Tk):
 
         self.barre_menus = Menu(self, tearoff=None) # Barre de menus principale de l'application
         self.menu_fichier = Menu(self.barre_menus, title="Fichier") # Créer un menu "Fichier"
-        self.menu_fichier.add_command(label="Quitter...", command=self.destroy) # Bouton pour quitter l'application
+        self.menu_fichier.add_command(label="Quitter...", command=self.quitter) # Bouton pour quitter l'application
 
         self.barre_menus.add_cascade(label="Fichier", menu=self.menu_fichier)
 
@@ -87,12 +86,16 @@ class Application(Tk):
 
 
 
+
+
+
     def afficher_resultats_recherche(self, event=None):
         "Afficher les résultats de recherche"
         #self.arbre_resultats.delete("1.0", END)
         # Effacer les résultats de recherche précédents
 
 
+        self.protocol("WM_DELETE_WINDOW", self.quitter)
         self.label_statut_recherche.config(text="Recherche en cours. Cela peut prendre un peu de temps...")
         
 
@@ -144,14 +147,19 @@ class Application(Tk):
 
             valeurs_col = colonnes_donnees[titres_colonnes[index]] # Extraire les valeurs de la colonne à afficher
             print(f"Valeurs de la colonne : {valeurs_col}")
-            for element in self.arbre_resultats.get_children(): # Pour chaque élément de l'arbe visuel
+            for element in self.arbre_resultats.get_children(): # Pour chaque élément de l'arbre visuel
+                print(element)
                 item = self.arbre_resultats.item(element, "values")  # Elément converti en item
                 item_liste = list(item) # Item converti sous forme de liste
+                items_affiches = item_liste # Items affichés
                 print(str(item))
                 for i, donnee in enumerate(item): # Si l'item n'est pas présent dans les valeurs de la colonne à afficher
                     if str(donnee) not in valeurs_col:
-                        item_liste[i] = "" # Transformer les éléments à ne pas afficher en une chaîne vide
-                        item = self.arbre_resultats.item(element, values=item_liste) # Actualiser l'item
+                        items_affiches[i] = "" # Transformer les éléments à ne pas afficher en une chaîne vide
+                        item = self.arbre_resultats.item(element, values=tuple(items_affiches)) # Actualiser l'item
+
+                item_liste = list(item)        
+
                         
 
             
@@ -197,6 +205,18 @@ class Application(Tk):
 
         self.label_statut_recherche.config(text=f"{self.resultats_affiches} résultats affichés sur {len(self.resultats_recheche)}")
         self.arbre_resultats.update() # Mettre à jour l'arbre visuel            
+
+
+    def quitter(self, event=None):
+        """Demande à l'utilisateur s'il souhaite quitter l'application"""
+        # Demander confirmation à l'utilisateur
+        quitter = messagebox.askyesno("Êtes-vous sûr(e) de quitter ?", "Quitter l'application annulera toute recherche en cours. Voulez-vous vraiment faire cela ?")
+
+        if quitter: # Si l'utilisateur a confirmé qu'il veut quitter l'application
+            self.destroy() # Détruire la fenêtre principale
+        
+        else: # Sinon
+            return # Annuler l'arrêt
 
 
 app = Application() # Créer une instance de l'application
