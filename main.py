@@ -153,12 +153,12 @@ class Application(Tk):
                 item_liste = list(item) # Item converti sous forme de liste
                 items_affiches = item_liste # Items affichés
                 print(str(item))
-                for i, donnee in enumerate(item): # Si l'item n'est pas présent dans les valeurs de la colonne à afficher
+                for i, donnee in enumerate(item_liste): # Si l'item n'est pas présent dans les valeurs de la colonne à afficher
                     if str(donnee) not in valeurs_col:
                         items_affiches[i] = "" # Transformer les éléments à ne pas afficher en une chaîne vide
                         item = self.arbre_resultats.item(element, values=tuple(items_affiches)) # Actualiser l'item
 
-                item_liste = list(item)        
+                #item_liste = list(item)        
 
                         
 
