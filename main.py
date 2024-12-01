@@ -3,15 +3,32 @@ from tkinter import * # Importer le module tkinter pour l'interface graphique
 from tkinter import ttk
 from tkinter import messagebox
 from imdb import Cinemagoer # Importer Cinemagoer depuis l'API imdb
-from recherche import * # Importer le module recherche qui contient les fonctions de recherche sur IMDB
+from scripts_recherche.recherche import * # Importer le module recherche qui contient les fonctions de recherche sur IMDB
 from scripts_filtres.filtrage import * # Importer le module filtrage, qui contient des fonctions pour appliquer des filtres de recherche, depuis le dossier scripts_filtres
 from scripts_filtres.dialogue_filtre import * # Importer le module dialogue_filtre depuis le dossier scripts_filtres afin de pouvoir demander à l'utilisateur de saisir des filtres
 import threading
+from itertools import chain
 
 
+def arbre_en_dict(arbre:ttk.Treeview) -> dict:    
+    """Renvoie un dictionnaire reflétant le contenu d'un arbre visuel.
+    - arbre : l'arbre visuel à convertir en dictionnaire"""
+    # Assertions
+    assert isinstance(arbre, ttk.Treeview), "L'arbre visuel doit être un objet ttk.Treeview"
 
+    titres_colonnes = arbre["columns"] # Obtenir les colonnes de l'arbre sous forme de liste
+    colonnes_donnees = {col : [] for col in titres_colonnes} # Dictionnaire contenant le titre des colonnes et leur contenu sous forme de liste
+            
 
+            # Remplir le dicitionnaire avec les éléments de l'arbre visuel
+    for element in arbre.get_children(): 
+            valeurs = arbre.item(element, "values")
+            for i, col in enumerate(titres_colonnes): # Pour chaque colonne
+                colonnes_donnees[col].append(str(valeurs[i]))  # Ajouter les valeurs correspondantes à la liste représentant son contenu
     
+    return colonnes_donnees # Retourner le contenu de l'arbre sous forme de dictionnaire
+
+
 class Application(Tk):
     def __init__(self):
         "Instance de l'application"
@@ -83,6 +100,8 @@ class Application(Tk):
 
         self.arbre_resultats.pack(fill="both")
 
+        self.contenu_arbre = {} # Dictionnaire vide représentant le contenu de l'arbre visuel
+
 
 
 
@@ -114,13 +133,18 @@ class Application(Tk):
             for resultat in self.resultats_recheche: # Pour chaque résultat de recherche
                 self.arbre_resultats.insert("", END, values=resultat) # Ajouter le résultat à l'arbre de résultats
                 self.resultats_affiches += 1 # Augmenter le nombre de résultats affichés
+                self.label_statut_recherche.config(text=f"{self.resultats_affiches} résultats affichés sur {len(self.resultats_recheche)}")    
+                
+                
 
         else: # Sinon
-            self.arbre_resultats.insert(parent="", index="end", text="Oups ! Pas de résultats de recherche.")
+            self.label_statut_recherche.config(text="Aucun résultat trouvé. Essayez d'autres termes de recherche.")
 
 
+        self.contenu_arbre = arbre_en_dict(self.arbre_resultats) # Mettre à jour le dictionnaire représentant le contenu de l'arbre visuel
         
-        self.label_statut_recherche.config(text=f"{self.resultats_affiches} résultats affichés sur {len(self.resultats_recheche)}")    
+        
+        
 
 
 
@@ -133,30 +157,35 @@ class Application(Tk):
 
         titres_colonnes = self.arbre_resultats["columns"]
         if type(index).__name__ == "int": # Si l'indice est un entier seul
-            colonnes_donnees = {col : [] for col in titres_colonnes} # Dictionnaire contenant le titre des colonnes et leur contenu sous forme de liste
+            assert index <= len(self.contenu_arbre), f"L'indice doit être inférieur ou égal à {len(self.contenu_arbre)}"
+            print(f"Contenu de l'arbre visuel : {self.contenu_arbre}")
+
+
+            # Tout d'abord, restaurer le contenu original de l'arbre visuel afin de ne pas le perdre
+            
             
 
-            # Remplir le dicitionnaire avec les éléments de l'arbre visuel
-            for element in self.arbre_resultats.get_children(): 
-                valeurs = self.arbre_resultats.item(element, "values")
-                for i, col in enumerate(titres_colonnes): # Pour chaque colonne
-                    colonnes_donnees[col].append(str(valeurs[i]))  # Ajouter les valeurs correspondantes à la liste représentant son contenu
 
-            #print(f"Données des colonnes : {colonnes_donnes}")
-
-
-            valeurs_col = colonnes_donnees[titres_colonnes[index]] # Extraire les valeurs de la colonne à afficher
+            valeurs_col = self.contenu_arbre[titres_colonnes[index]] # Extraire les valeurs de la colonne à afficher
             print(f"Valeurs de la colonne : {valeurs_col}")
-            for element in self.arbre_resultats.get_children(): # Pour chaque élément de l'arbre visuel
-                print(element)
-                item = self.arbre_resultats.item(element, "values")  # Elément converti en item
+            for i, element in enumerate(valeurs_col): # Pour chaque élément de l'arbre visuel
+                #print(f"Element : {element}")
+                item = self.arbre_resultats.item(self.arbre_resultats.identify_element(index, i), "values")  # Elément converti en item
                 item_liste = list(item) # Item converti sous forme de liste
                 items_affiches = item_liste # Items affichés
-                print(str(item))
+                #print(str(item))
                 for i, donnee in enumerate(item_liste): # Si l'item n'est pas présent dans les valeurs de la colonne à afficher
-                    if str(donnee) not in valeurs_col:
+                    print(f"Donnée : {str(donnee)}")
+                    for el in chain(self.contenu_arbre):
+                        print(f"el : {el}")
+
+                    if str(donnee) not in chain(*self.contenu_arbre) and len(valeurs_col) > 0:
                         items_affiches[i] = "" # Transformer les éléments à ne pas afficher en une chaîne vide
                         item = self.arbre_resultats.item(element, values=tuple(items_affiches)) # Actualiser l'item
+
+                    else:
+                        items_affiches[i] = str(donnee)
+                        item = self.arbre_resultats.item(element, values=tuple(items_affiches))    
 
                 #item_liste = list(item)        
 

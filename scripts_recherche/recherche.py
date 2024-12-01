@@ -1,6 +1,7 @@
 "recherche.py contient des fonctions permettant de rechercher des éléments sur IMDB via l'API imdb"
 from imdb import * # Importer l'API imdb
 from tkinter import messagebox
+from tkinter import ttk
 from cache import * # Importer cache.py pour gérer les caches
 
 
@@ -39,7 +40,7 @@ def rechercher(requete:str) -> list:
 
             titre = infos_film["title"] # Récupérer le titre du film
             realisateurs = [dir["name"] for dir in infos_film["directors"]] # Récupérer le(s) réalisateur(s) du film
-            print(f"Réalisateur(s) : {"".join(realisateurs)}")
+            #print(f"Réalisateur(s) : {"".join(realisateurs)}")
             annee = infos_film["year"] # Récupérer l'année de sortie du film
 
             #print(f"Titre : {titre}, Réalisateur(s) : {"".join(realisateurs)}, Année : {annee} ")   
@@ -48,7 +49,7 @@ def rechercher(requete:str) -> list:
 
 
         except Exception as e: # En cas d'erreur
-            print(f"Erreur durant le traitement des résultats de recherche : {str(e)}") 
+            #print(f"Erreur durant le traitement des résultats de recherche : {str(e)}") 
             continue
 
         except ConnectionError: # En cas d'erreur de connection
