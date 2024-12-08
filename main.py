@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from imdb import Cinemagoer # Importer Cinemagoer depuis l'API imdb
 from scripts_recherche.recherche import * # Importer le module recherche qui contient les fonctions de recherche sur IMDB
+from scripts_recherche.progression import *
 from scripts_filtres.filtrage import * # Importer le module filtrage, qui contient des fonctions pour appliquer des filtres de recherche, depuis le dossier scripts_filtres
 from scripts_filtres.dialogue_filtre import * # Importer le module dialogue_filtre depuis le dossier scripts_filtres afin de pouvoir demander à l'utilisateur de saisir des filtres
 import threading
@@ -46,7 +47,6 @@ class Application(Tk):
         self.menu_afficher.add_checkbutton(label="Titre", command=lambda:self.afficher_colonne(0)) # Commande pour afficher les titres seulement
         self.menu_afficher.add_checkbutton(label="Réalisateur(s)", command=lambda:self.afficher_colonne(1)) # Commande pour afficher uniquement le(s) réalisateur(s)
         self.menu_afficher.add_checkbutton(label="Année", command=lambda:self.afficher_colonne(2)) # Commande pour afficher l'année uniquement
-
         self.barre_menus.add_cascade(label="Afficher", menu=self.menu_afficher)
 
 
@@ -117,6 +117,9 @@ class Application(Tk):
         self.protocol("WM_DELETE_WINDOW", self.quitter)
         self.label_statut_recherche.config(text="Recherche en cours. Cela peut prendre un peu de temps...")
         
+        # Afficher une barre de progression qui indique l'état actuel de la recherche
+        barre_progression = ttk.Progressbar(self, length=300, mode="determinate", maximum=100)
+        barre_progression.pack(pady=20)
 
         for resultat in self.arbre_resultats.get_children():
             self.arbre_resultats.delete(resultat)
@@ -124,7 +127,15 @@ class Application(Tk):
 
         self.arbre_resultats.insert("", END, values="".join("Recherche en cours..."))
         self.arbre_resultats.update() # Mettre à jour l'arbre pour afficher le texte
-        self.resultats_recheche = rechercher(self.barre_recherche.get()) # Rechercher dans IMDB les éléments qui correspondent à la requête entrée dans la barre de recherche
+        
+        self.resultats_recheche = rechercher(self.barre_recherche.get(), self, Application, barre_progression) # Rechercher dans IMDB les éléments qui correspondent à la requête entrée dans la barre de recherche
+        barre_progression.destroy() # Détruire la barre de progression une fois la recherche finie
+            
+            
+        #afficher_progression(self, barre, self.resultats_recheche) 
+    
+
+        
         items = self.arbre_resultats.get_children() # Obtenir les items présents dans l'arbre visuel
         for item in items: # Supprimer les items
             self.arbre_resultats.delete(item)
@@ -154,11 +165,12 @@ class Application(Tk):
 
         # Assertions
         assert isinstance(index, int) or isinstance(index, list), "index doit être un entier ou une liste d'entiers" # Vérifier que index est un entier ou une liste d'entiers
-
+        
         titres_colonnes = self.arbre_resultats["columns"]
         if type(index).__name__ == "int": # Si l'indice est un entier seul
             assert index <= len(self.contenu_arbre), f"L'indice doit être inférieur ou égal à {len(self.contenu_arbre)}"
             print(f"Contenu de l'arbre visuel : {self.contenu_arbre}")
+            print()
 
 
             # Tout d'abord, restaurer le contenu original de l'arbre visuel afin de ne pas le perdre
@@ -166,29 +178,24 @@ class Application(Tk):
             
 
 
-            valeurs_col = self.contenu_arbre[titres_colonnes[index]] # Extraire les valeurs de la colonne à afficher
+            valeurs_col = [self.contenu_arbre[titres_colonnes[index]][i] 
+                  for i in range(len(self.contenu_arbre))] # Extraire les valeurs de la colonne à afficher
             print(f"Valeurs de la colonne : {valeurs_col}")
-            for i, element in enumerate(valeurs_col): # Pour chaque élément de l'arbre visuel
+            
+            for i, element in enumerate(self.contenu_arbre): # Pour chaque élément de l'arbre visuel
                 #print(f"Element : {element}")
                 item = self.arbre_resultats.item(self.arbre_resultats.identify_element(index, i), "values")  # Elément converti en item
-                item_liste = list(item) # Item converti sous forme de liste
-                items_affiches = item_liste # Items affichés
+                valeurs = list(item) # Valeurs de l'item
                 #print(str(item))
-                for i, donnee in enumerate(item_liste): # Si l'item n'est pas présent dans les valeurs de la colonne à afficher
-                    print(f"Donnée : {str(donnee)}")
-                    for el in chain(self.contenu_arbre):
-                        print(f"el : {el}")
+                
+                if str(valeurs_col[i]) == "" or valeurs_col[i] == None: 
+                    valeurs[index] = ""
 
-                    if str(donnee) not in chain(*self.contenu_arbre) and len(valeurs_col) > 0:
-                        items_affiches[i] = "" # Transformer les éléments à ne pas afficher en une chaîne vide
-                        item = self.arbre_resultats.item(element, values=tuple(items_affiches)) # Actualiser l'item
+                else:
+                    valeurs[index] = str(valeurs_col[i])    
 
-                    else:
-                        items_affiches[i] = str(donnee)
-                        item = self.arbre_resultats.item(element, values=tuple(items_affiches))    
 
-                #item_liste = list(item)        
-
+                self.arbre_resultats.item(element, values=valeurs)
                         
 
             

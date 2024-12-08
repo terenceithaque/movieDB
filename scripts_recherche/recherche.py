@@ -1,16 +1,29 @@
 "recherche.py contient des fonctions permettant de rechercher des éléments sur IMDB via l'API imdb"
 from imdb import * # Importer l'API imdb
+from imdb._exceptions import IMDbDataAccessError
+from urllib.error import URLError
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter import Tk
 from cache import * # Importer cache.py pour gérer les caches
+from scripts_recherche.progression import *
+from threading import Thread
+from .notifications_recherche import afficher_notification # Importer la fonciton afficher_notification depuis le module notifications_recherche
+
+
+
 
 
 cache = IMDBCache() # Créer un cache pour réduire les appels redondants à l'API IMDB
 explorateur = Cinemagoer() # Objet Cinemagoer permettant d'explorer IMDB via l'API
 
 
-def rechercher(requete:str) -> list:
-    "Recherche le contenu de requete sur IMDB"
+def rechercher(requete:str, maitre=None|Tk, classemaitre=None,  barre=None|ttk.Progressbar) -> list:
+    """Recherche le contenu de requete sur IMDB et met à jour la barre de progression barre
+    - requete : élément à rechercher
+    - maitre: widget maître de la barre de progression
+    - classemaitre: classe spécifique du widget maitre, optionnel
+    - barre: la barre de progression à mettre à jour"""
 
     # Assertions
     assert isinstance(requete, str), "requete doit être une chaîne de caractères"
@@ -29,7 +42,7 @@ def rechercher(requete:str) -> list:
 
 
 
-
+    resultats = 0
     for film in films: # Pour chaque film trouvé
         try: # Tenter de récupérer les infos du film depuis le cache
             id_film = film.movieID # Récupérer l'ID du film
@@ -47,28 +60,32 @@ def rechercher(requete:str) -> list:
 
             liste_resultats.append((titre, "".join(realisateurs), annee)) # Ajouter le film à la liste des résultats 
 
+            resultats = len(liste_resultats)
 
-        except Exception as e: # En cas d'erreur
-            #print(f"Erreur durant le traitement des résultats de recherche : {str(e)}") 
-            continue
+            print(f"Traitement de {resultats} résultats.")
+            #if isinstance(maitre, Tk) and isinstance(barre, ttk.Progressbar) or isinstance(maitre, classemaitre) and isinstance(barre, ttk.Progressbar): # Si on doit mettre à jour une barre de progression pour indiquer le stade de la recherche
+            #    Thread(target=lambda:afficher_progression(maitre, barre, liste_resultats)).start() # Mettre à jour la barre de progression
 
-        except ConnectionError: # En cas d'erreur de connection
-            messagebox.showerror("Erreur de connexion", "Impossible de se connecter à IMDB. Vérifiez votre connexion Internet, puis réessayez.")
+
+        
+
+        except IMDbDataAccessError: # En cas d'erreur de connection à IMDB
+            messagebox.showerror("""Erreur de connexion avec IMDB", "Impossible de se connecter à IMDB. \n
+                                  -  Il se peut que le site soit inaccessible quand bien même votre connexionn est effective (panne serveur, etc),
+                                  - Il se peut aussi que votre connexion réseau soit défaillante. Essayez de vous reconnecter puis réessayez.""")
             return liste_resultats # Si des résultats on quand même été trouvés, les renvoyer
 
+        except URLError as e: # En cas de connection générale
+            #print(f"Erreur durant le traitement des résultats de recherche : {str(e)}") 
+            messagebox.showerror("Erreur : connexion internet défaillante", "Impossible de se connecter à Internet. Vérifiez l'état de votre connexion et réessayez.")
+            continue
 
-        """id_film = film.movieID # ID IMDB du film
-        infos_film = explorateur.get_movie(id_film) # Récupérer les infos sur le film (réalisateur(s), date,...)
 
-        try: # Essayer de récupérer le(s) réalisateur(s), titre et année du film
-            titre = infos_film["title"]
-            realisateurs = ",".join(dir["name"] for dir in infos_film["directors"])
-            annee = infos_film["year"]
-            print(f"Titre : {titre}, Realisateurs : {"".join(realisateurs)}, Année : {annee}")
-            
+        except KeyError: # En cas d'erreur de clé introuvable
+            continue
+
         
-        except: # En cas d'erreur
-            continue # Passer au résultat suivant"""
+        
 
     #for personnage in personnages: # Pour chaque personnage de film trouvé    
     #   liste_resultats.append(personnage) # Ajouter le personnage à la liste des résultats
@@ -79,5 +96,7 @@ def rechercher(requete:str) -> list:
     
     #print(f"Résultats trouvés : {liste_resultats}")
     print("Recherche terminée !")
+    if not maitre.focus_get(): # Si l'application maître n'a pas le focus
+        afficher_notification(titre="Recherche terminée !", message=f"movieDB a terminé la recherche pour {requete}.") # Envoyer une notification à l'utilisateur pour indiquer que la recherche est terminée
     return liste_resultats # Renvoyer la liste des résultats trouvés
     
