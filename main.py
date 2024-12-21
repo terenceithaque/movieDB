@@ -52,6 +52,12 @@ class Application(Tk):
 
         self.menu_tri_filtres = Menu(self.barre_menus, tearoff=0) # Menu pour les options de tri et de filtre
         self.sous_menu_tri = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de tri
+        self.sous_menu_tri.add_command(label="Titre - ordre alphabétique...")
+        self.sous_menu_tri.add_command(label="Titre - ordre anti-alphabétique...")
+        self.sous_menu_tri.add_command(label="Réalisateurs - ordre alphabétique...")
+        self.sous_menu_tri.add_command(label="Réalisateurs - ordre anti-alphabétique...")
+        self.sous_menu_tri.add_command(label="Année - ordre croissant...")
+        self.sous_menu_tri.add_command(label="Année - ordre décroissant...")
         self.menu_tri_filtres.add_cascade(label="Tri...", menu=self.sous_menu_tri)
         self.sous_menu_filtres = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de filtre
 
@@ -165,8 +171,8 @@ class Application(Tk):
 
         # Assertions
         assert isinstance(index, int) or isinstance(index, list), "index doit être un entier ou une liste d'entiers" # Vérifier que index est un entier ou une liste d'entiers
-        
-        titres_colonnes = self.arbre_resultats["columns"]
+        pass
+        """titres_colonnes = self.arbre_resultats["columns"]
         if type(index).__name__ == "int": # Si l'indice est un entier seul
             assert index <= len(self.contenu_arbre), f"L'indice doit être inférieur ou égal à {len(self.contenu_arbre)}"
             print(f"Contenu de l'arbre visuel : {self.contenu_arbre}")
@@ -182,28 +188,43 @@ class Application(Tk):
                   for i in range(len(self.contenu_arbre))] # Extraire les valeurs de la colonne à afficher
             print(f"Valeurs de la colonne : {valeurs_col}")
             
-            for i, element in enumerate(self.contenu_arbre): # Pour chaque élément de l'arbre visuel
+            for i, element in enumerate(self.arbre_resultats.get_children()): # Pour chaque élément de l'arbre visuel et dans le dictionnaire représentant le contenu de l'arbre
                 #print(f"Element : {element}")
                 item = self.arbre_resultats.item(self.arbre_resultats.identify_element(index, i), "values")  # Elément converti en item
                 valeurs = list(item) # Valeurs de l'item
+                print(f"Valeurs de l'item : {valeurs}")
                 #print(str(item))
                 
                 if str(valeurs_col[i]) == "" or valeurs_col[i] == None: 
                     valeurs[index] = ""
 
                 else:
-                    valeurs[index] = str(valeurs_col[i])    
+                    if len(valeurs) > 0:
+                        valeurs[index] = str(valeurs_col[i])
 
+                    else:
+                        valeurs = list(str(valeurs_col[i]))        
 
-                self.arbre_resultats.item(element, values=valeurs)
+                if element in self.arbre_resultats.get_children():
+                    self.arbre_resultats.item(element, values=valeurs)
                         
 
             
             self.arbre_resultats.update() # Mettre à jour l'arbre visuel 
 
         elif type(index).__name__ =="list": # Si plusieurs indices ont été fournis
-            pass        
+            for element in self.arbre_resultats.get_children(): # Pour chaque élément de l'arbre visuel
+                self.arbre_resultats.delete(element) # Supprimer l'élément
 
+            for i in index: # Pour chaque indice de la liste d'indices
+                titre_col = titres_colonnes[i] # Titre de la colonne correspondante
+                contenu_col = self.contenu_arbre.get(titre_col) # Obtenir le contenu de la colonne
+                valeurs = []
+                for element in contenu_col:
+                    valeurs.append(element)
+                    item = self.arbre_resultats.item(element)
+                    self.arbre_resultats.item(item, valeurs)            
+    """
            
 
 
