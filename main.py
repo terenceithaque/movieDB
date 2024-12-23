@@ -8,6 +8,7 @@ from scripts_recherche.progression import *
 from scripts_filtres.filtrage import * # Importer le module filtrage, qui contient des fonctions pour appliquer des filtres de recherche, depuis le dossier scripts_filtres
 from scripts_filtres.dialogue_filtre import * # Importer le module dialogue_filtre depuis le dossier scripts_filtres afin de pouvoir demander à l'utilisateur de saisir des filtres
 import threading
+from scripts_tri.tri import * # Importer le module tri
 from itertools import chain
 
 
@@ -52,12 +53,14 @@ class Application(Tk):
 
         self.menu_tri_filtres = Menu(self.barre_menus, tearoff=0) # Menu pour les options de tri et de filtre
         self.sous_menu_tri = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de tri
-        self.sous_menu_tri.add_command(label="Titre - ordre alphabétique...")
-        self.sous_menu_tri.add_command(label="Titre - ordre anti-alphabétique...")
-        self.sous_menu_tri.add_command(label="Réalisateurs - ordre alphabétique...")
-        self.sous_menu_tri.add_command(label="Réalisateurs - ordre anti-alphabétique...")
-        self.sous_menu_tri.add_command(label="Année - ordre croissant...")
-        self.sous_menu_tri.add_command(label="Année - ordre décroissant...")
+        self.sous_menu_tri.add_command(label="Titre - ordre alphabétique...", command=lambda: self.trier(col=0, ordre=1))
+        self.sous_menu_tri.add_command(label="Titre - ordre anti-alphabétique...", command=lambda: self.trier(col=0, ordre=-1))
+        self.sous_menu_tri.add_separator()
+        self.sous_menu_tri.add_command(label="Réalisateurs - ordre alphabétique...", command=lambda: self.trier(col=1, ordre=1))
+        self.sous_menu_tri.add_command(label="Réalisateurs - ordre anti-alphabétique...", command=lambda: self.trier(col=1, ordre=-1))
+        self.sous_menu_tri.add_separator()
+        self.sous_menu_tri.add_command(label="Année - ordre croissant...", command=lambda: self.trier(col=2, ordre=1))
+        self.sous_menu_tri.add_command(label="Année - ordre décroissant...", command=lambda: self.trier(col=2, ordre=-1))
         self.menu_tri_filtres.add_cascade(label="Tri...", menu=self.sous_menu_tri)
         self.sous_menu_filtres = Menu(self.menu_tri_filtres, tearoff=0) # Menu pour les options de filtre
 
@@ -163,6 +166,25 @@ class Application(Tk):
         
         
 
+    def trier(self, col=1, ordre = 1 | -1):
+        """Trie le contenu de l'arbre visuel selon un ordre donné.
+        col : numéro de la colonne à trier
+        ordre : entier représentant l'ordre de tri. Si égal à 1, effectue un tri alphabétique / croissant, et si égal à -1, effectue un tri anti-alphabétique / décroissant"""
+
+        # Assertions
+        assert col >= 0 and col <= 4, "Le numéro de la colonne doit être compris entre 0 inclus et 3 exclu"
+        assert ordre == 1 or ordre == -1, "L'ordre spécifié doit être égal à 1 ou -1"
+
+        for element in self.arbre_resultats.get_children(): # Pour chaque élément présent dans l'arbre visuel
+            item = self.arbre_resultats.item(element)
+            self.arbre_resultats.delete(item)
+
+
+        if ordre == 1: # Si l'on doit effectuer un tri dans l'ordre alphabétique / croissant
+            pass
+
+        elif ordre == -1: # Si l'on droit effectuer un tri dans l'ordre anti-alphabétique / décroissant
+            pass    
 
 
     def afficher_colonne(self, index=int|list):
