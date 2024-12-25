@@ -20,7 +20,7 @@ def tri_decroissant(liste : list[int]) -> list[int]:
     "Effectue un tri par ordre décroissant sur une liste de nombres entiers liste"
     return sorted(liste, key = lambda x: x)[::-1]
 
-liste = [1, 9, 10, 17, 121]
+"""liste = [1, 9, 10, 17, 121]
 liste = tri_decroissant(liste)
-print(liste)
+print(liste)"""
 

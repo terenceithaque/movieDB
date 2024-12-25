@@ -175,13 +175,33 @@ class Application(Tk):
         assert col >= 0 and col <= 4, "Le numéro de la colonne doit être compris entre 0 inclus et 3 exclu"
         assert ordre == 1 or ordre == -1, "L'ordre spécifié doit être égal à 1 ou -1"
 
+
+        colonnes = self.contenu_arbre.keys() # Obtenir les colonnes de l'abre visuem
+        print(f"Titres des colonnes : {colonnes}")
         for element in self.arbre_resultats.get_children(): # Pour chaque élément présent dans l'arbre visuel
-            item = self.arbre_resultats.item(element)
-            self.arbre_resultats.delete(item)
+            try:
+                self.arbre_resultats.delete(element) # Supprimer l'élément de l'arbre visuel
+                print(element)
+                valeurs_item = self.arbre_resultats.item(element, "values") # Obtenir les valeurs de l'item correspondant à l'élément
+            
+            except:
+                continue
+
+
 
 
         if ordre == 1: # Si l'on doit effectuer un tri dans l'ordre alphabétique / croissant
-            pass
+            colonne = list(self.contenu_arbre.keys())[col] # Obtenir le nom de la colonne à trier
+            contenu = self.contenu_arbre[colonne] # Obtenir le contenu de l'arbre pour la colonne
+            print(f"Contenu non trié : {contenu}")
+            if (type(el).__name__ == "str" for el in contenu): # Si le contenu possède des chaînes de caractères
+                contenu = tri_alphabetique(contenu) # Mettre à jour le contenu de la colonne en faisant un tri alphabétique
+                
+
+            elif (type(el).__name__ == "int" for el in contenu): # Si le contenu possède des nombre entiers    
+                contenu = tri_croissant(contenu) # Effectuer un tri croissant du contenu
+
+            print(f"Contenu trié : {contenu}")
 
         elif ordre == -1: # Si l'on droit effectuer un tri dans l'ordre anti-alphabétique / décroissant
             pass    

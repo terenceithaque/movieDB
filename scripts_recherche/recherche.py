@@ -70,8 +70,9 @@ def rechercher(requete:str, maitre=None|Tk, classemaitre=None,  barre=None|ttk.P
         
 
         except IMDbDataAccessError: # En cas d'erreur de connection à IMDB
-            messagebox.showerror("""Erreur de connexion avec IMDB", "Impossible de se connecter à IMDB. \n
-                                  -  Il se peut que le site soit inaccessible quand bien même votre connexionn est effective (panne serveur, etc),
+            messagebox.showerror("Erreur de connexion avec IMDB", 
+                                """
+                                  -  Il se peut que le site soit inaccessible quand bien même votre connexion est effective (panne serveur, etc),
                                   - Il se peut aussi que votre connexion réseau soit défaillante. Essayez de vous reconnecter puis réessayez.""")
             return liste_resultats # Si des résultats on quand même été trouvés, les renvoyer
 
